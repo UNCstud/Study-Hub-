@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CHEM 101L Review Game</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e222d;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --accent: #5fe6c8;
+    --accent-dim: rgba(95,230,200,0.12);
+    --accent-dim2: rgba(95,230,200,0.22);
+    --red: #ff5f6b;
+    --red-dim: rgba(255,95,107,0.12);
+    --amber: #f5a623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --blue: #6fa8ff;
+    --blue-dim: rgba(111,168,255,0.1);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+
+  .top-bar {
+    width: 100%; max-width: 680px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 0 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    position: relative; z-index: 1;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .logo {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace;
+  }
+
+  .stats { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .stat-pill {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 20px; padding: 5px 14px;
+    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat-pill strong { color: var(--text); font-weight: 500; }
+
+  .main { width: 100%; max-width: 680px; position: relative; z-index: 1; }
+
+  .filter-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 6px 14px;
+    border-radius: 20px; border: 1px solid var(--border2);
+    background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent-dim2); border-color: var(--accent); color: var(--accent); }
+
+  .progress-track {
+    height: 3px; background: var(--border);
+    border-radius: 3px; margin-bottom: 28px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 3px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px 24px;
+    animation: slideIn 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-meta {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+
+  .cat-badge {
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 4px;
+    background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(111,168,255,0.2);
+  }
+
+  .type-badge {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); padding: 4px 8px;
+    border: 1px solid var(--border); border-radius: 4px;
+  }
+
+  .question-text {
+    font-size: 18px; font-weight: 600; line-height: 1.5;
+    color: var(--text); margin-bottom: 22px;
+    letter-spacing: -0.01em;
+  }
+
+  .multi-hint {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--amber); background: var(--amber-dim);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 4px; padding: 4px 10px;
+    display: inline-block; margin-bottom: 14px; letter-spacing: 0.05em;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+
+  .opt-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 13px 16px;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 400;
+    color: var(--text); cursor: pointer; text-align: left;
+    transition: all 0.15s; display: flex; align-items: flex-start; gap: 12px;
+    line-height: 1.5;
+  }
+
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--border2);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .opt-btn.selected {
+    background: var(--blue-dim);
+    border-color: rgba(111,168,255,0.35);
+    color: var(--blue);
+  }
+
+  .opt-btn.correct {
+    background: var(--accent-dim2);
+    border-color: rgba(95,230,200,0.4);
+    color: var(--accent);
+  }
+
+  .opt-btn.wrong {
+    background: var(--red-dim);
+    border-color: rgba(255,95,107,0.3);
+    color: var(--red);
+  }
+
+  .opt-letter {
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+    min-width: 20px; padding-top: 1px; opacity: 0.5;
+  }
+  .opt-btn.selected .opt-letter,
+  .opt-btn.correct .opt-letter,
+  .opt-btn.wrong .opt-letter { opacity: 0.8; }
+
+  .short-answer-area { display: flex; flex-direction: column; gap: 10px; }
+
+  .short-input {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 13px 16px;
+    font-family: 'Syne', sans-serif; font-size: 14px; color: var(--text);
+    transition: border-color 0.15s; outline: none;
+  }
+
+  .short-input:focus { border-color: var(--accent); }
+  .short-input::placeholder { color: var(--muted); }
+  .short-input:disabled { opacity: 0.5; }
+
+  .feedback {
+    border-radius: var(--radius); padding: 14px 16px;
+    font-size: 14px; line-height: 1.6; margin-top: 14px;
+    font-family: 'DM Mono', monospace; letter-spacing: -0.01em;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .feedback.correct {
+    background: var(--accent-dim2);
+    border: 1px solid rgba(95,230,200,0.25);
+    color: var(--accent);
+  }
+
+  .feedback.wrong {
+    background: var(--red-dim);
+    border: 1px solid rgba(255,95,107,0.2);
+    color: #ff8a92;
+  }
+
+  .feedback.info {
+    background: var(--blue-dim);
+    border: 1px solid rgba(111,168,255,0.2);
+    color: #9ec4ff;
+  }
+
+  .feedback .fb-label {
+    font-weight: 500; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 6px; opacity: 0.7;
+  }
+
+  .feedback .fb-explain {
+    font-family: 'Syne', sans-serif; font-size: 13px;
+    margin-top: 8px; opacity: 0.75; line-height: 1.6;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 8px;
+  }
+
+  .action-row { display: flex; gap: 8px; margin-top: 20px; }
+
+  .btn-primary {
+    background: var(--accent); color: #0d0f14;
+    border: none; border-radius: var(--radius);
+    padding: 12px 22px; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 12px 22px;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+
+  .end-screen {
+    text-align: center; padding: 48px 24px;
+    animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .end-ring {
+    width: 120px; height: 120px; margin: 0 auto 24px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  .end-ring svg {
+    position: absolute; inset: -3px;
+    transform: rotate(-90deg);
+  }
+
+  .end-ring .ring-score { font-size: 32px; font-weight: 800; color: var(--text); }
+  .end-ring .ring-total { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+
+  .end-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .end-msg { font-size: 14px; color: var(--muted); margin-bottom: 32px; line-height: 1.6; max-width: 360px; margin-left: auto; margin-right: auto; }
+
+  .end-breakdown {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin-bottom: 28px; text-align: left;
+  }
+
+  .breakdown-cell {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+  }
+  .breakdown-cell .bc-cat { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .breakdown-cell .bc-val { font-size: 18px; font-weight: 700; color: var(--text); }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="top-bar">
+  <span class="logo">⬡ CHEM 101L — Final Review</span>
+  <div class="stats">
+    <div class="stat-pill">Score <strong id="stat-score">0/0</strong></div>
+    <div class="stat-pill">Question <strong id="stat-q">1/25</strong></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="filter-row" id="filter-row"></div>
+  <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div id="game-area"></div>
+</div>
+
+<script>
+const questions = [
+  { cat:"Safety", type:"mc", q:"When should you wear gloves in the lab? (Select all that apply)", opts:["When weighing out reagents at the balances","When entering data into your ELN on your laptop","When handling glassware","When writing notes on scratch paper"], correct:[0,2], multi:true, explain:"Gloves are needed when touching chemicals or glassware — not for dry paperwork or laptop use." },
+  { cat:"Safety", type:"mc", q:"When is food allowed at the bench top in the lab?", opts:["If experimental work is over and cleaned up","At the beginning — it's dinner time!","Only if food stays in the backpack","Never"], correct:[3], explain:"Food is NEVER allowed at the bench top in a chemistry lab." },
+  { cat:"Error Analysis", type:"mc", q:"Which type of error arises from a flaw in equipment or experimental design, and can be detected and corrected?", opts:["Random error","Systematic error","Human error","Sampling error"], correct:[1], explain:"Systematic error comes from equipment or design flaws. It is consistent and can be identified and corrected." },
+  { cat:"Error Analysis", type:"mc", q:"Which error type has an equal chance of being positive or negative and cannot be corrected for?", opts:["Systematic error","Instrumental error","Random error","Design error"], correct:[2], explain:"Random error is uncontrollable (e.g. temperature fluctuations) and averages out over many trials." },
+  { cat:"Error Analysis", type:"short", q:"Define accuracy.", answer:"How close a measurement is to the true (accepted) value.", explain:"Accuracy = closeness to the true value. Precision = repeatability (closeness of measurements to each other)." },
+  { cat:"Error Analysis", type:"short", q:"Define precision.", answer:"How close repeated measurements are to each other (reproducibility).", explain:"You can be precise without being accurate — like consistently hitting the wrong spot on a target." },
+  { cat:"Spectroscopy", type:"mc", q:"You look through a spectroscope and see several discrete, clearly defined lines. What is the most likely source?", opts:["Incandescent lightbulb","Candle","Fluorescent lamp","Sunlight"], correct:[2], explain:"Fluorescent lamps emit discrete spectral lines. Incandescent bulbs and candles produce continuous spectra." },
+  { cat:"Spectroscopy", type:"mc", q:"An electron moves from the ground state (n=1) to an excited state (n=5). Which is true?", opts:["Emission; ΔE is negative","Absorbance; ΔE is positive","Emission; ΔE is positive","Absorbance; ΔE is negative"], correct:[1], explain:"Moving to a higher energy level requires absorbing a photon (absorbance). ΔE is positive and the electron is less stable." },
+  { cat:"Spectroscopy", type:"short", q:"A calibration curve gives y = 0.0084x − 1.237. What wavelength (nm) corresponds to a scale reading of 6.57?", answer:"≈ 929 nm  →  x = (6.57 + 1.237) / 0.0084 = 7.807 / 0.0084 ≈ 929 nm", explain:"Rearrange y = mx + b to solve for x: x = (y + 1.237) / 0.0084" },
+  { cat:"Beer's Law", type:"mc", q:"What is the purpose of a blank in a Beer's Law experiment?", opts:["Test the instrument's maximum absorbance","Set baseline absorbance to zero using just the solvent","Measure the concentration of the unknown","Determine λmax"], correct:[1], explain:"The blank (pure solvent) zeroes out the spectrophotometer so measured absorbance is only from the solute." },
+  { cat:"Beer's Law", type:"mc", q:"Why do we record absorbance at λmax?", opts:["It's the easiest wavelength to see","It gives the most sensitive and reproducible readings","It avoids cuvette interference","λmax is always in the visible range"], correct:[1], explain:"At λmax, absorbance changes most per unit concentration, maximizing Beer's Law sensitivity." },
+  { cat:"Beer's Law", type:"short", q:"A solution absorbs 50% of a specific wavelength. What is the absorbance?", answer:"A = −log(0.50) ≈ 0.301", explain:"A = −log(I/I₀) = −log(0.50) = 0.301. %T = 50%, so I/I₀ = 0.50." },
+  { cat:"Beer's Law", type:"short", q:"Using A = 17453C + 0.0745, find concentration when A = 1.0.", answer:"C = (1.0 − 0.0745) / 17453 ≈ 5.30 × 10⁻⁵ M", explain:"Rearrange Beer's Law trendline: C = (A − b) / m = 0.9255 / 17453 ≈ 5.30 × 10⁻⁵ M" },
+  { cat:"Gas Laws", type:"mc", q:"Which is a characteristic of an ideal gas?", opts:["Molecules have significant intermolecular attractions","Molecules occupy significant volume","Molecules undergo perfectly elastic collisions","Molecules slow down at higher temperatures"], correct:[2], explain:"Ideal gases have no intermolecular forces, negligible molecular volume, and perfectly elastic collisions." },
+  { cat:"Gas Laws", type:"mc", q:"What law relates pressure and temperature at constant volume?", opts:["Boyle's Law","Charles's Law","Gay-Lussac's Law","Avogadro's Law"], correct:[2], explain:"Gay-Lussac's Law: P/T = constant at constant volume and moles of gas." },
+  { cat:"Gas Laws", type:"mc", q:"Which noble gas behaves most ideally?", opts:["Xenon (Xe)","Argon (Ar)","Neon (Ne)","Helium (He)"], correct:[3], explain:"Helium is smallest with fewest electrons, so it has the weakest London dispersion forces and is most ideal." },
+  { cat:"Gas Laws", type:"mc", q:"Which are sources of error in the gas law experiment? (best answer)", opts:["Air was used as an ideal gas model","Air leaks in the apparatus","Water was not completely boiling","All of the above"], correct:[3], explain:"All three introduce error: air isn't perfectly ideal, leaks change pressure, incomplete boiling means uncertain temperature." },
+  { cat:"Gas Laws", type:"short", q:"What is absolute zero, and what does it imply about pressure?", answer:"0 K (−273.15 °C) — theoretical temp where all molecular motion stops; pressure would be zero.", explain:"At absolute zero, gas particles have zero kinetic energy → zero pressure (Gay-Lussac's Law extrapolation)." },
+  { cat:"IMFs", type:"mc", q:"If molecule A has a larger ΔHvap than molecule B, what can you say about A's IMFs?", opts:["They are weaker","They are stronger","They are equal","Cannot be determined"], correct:[1], explain:"Larger ΔHvap = more energy needed to vaporize = stronger intermolecular forces holding molecules together." },
+  { cat:"IMFs", type:"mc", q:"Liquids with stronger IMFs have _____ ΔHvap and molecules escape into vapor _____.", opts:["Larger; with difficulty","Larger; easily","Smaller; easily","Smaller; with difficulty"], correct:[0], explain:"Strong IMFs → high energy needed to vaporize → large ΔHvap → molecules escape with difficulty." },
+  { cat:"IMFs", type:"mc", q:"Which would produce the LARGER temperature drop (ΔT) during evaporation?", opts:["Large ΔHvap","Small ΔHvap","Stronger IMFs","Capable of hydrogen bonding"], correct:[1], explain:"Small ΔHvap = molecules escape easily → more rapid evaporation → larger cooling effect (larger ΔT)." },
+  { cat:"IMFs", type:"mc", q:"Methanol (CH₃OH) has a larger ΔHvap than methane (CH₄) because of:", opts:["Higher molar mass","Larger molecular size","Hydrogen bonding in methanol","London dispersion forces in methane"], correct:[2], explain:"Methanol has an O−H group capable of hydrogen bonding; methane cannot, so methanol has much stronger IMFs." },
+  { cat:"IMFs", type:"short", q:"How does branching affect intermolecular forces in molecules with the same formula?", answer:"More branching = weaker London dispersion forces (less surface area for molecular contact).", explain:"Branched molecules are more compact/spherical, reducing contact area → fewer and weaker dispersion interactions." },
+  { cat:"Solutions", type:"short", q:"What is a spectator ion?", answer:"An ion present in solution that does NOT participate in the chemical reaction (appears unchanged on both sides).", explain:"Spectator ions are removed from the total ionic equation to give the net ionic equation." },
+  { cat:"Solutions", type:"mc", q:"'Like dissolves like' means:", opts:["Solids dissolve in solids","Polar solvents dissolve polar solutes; nonpolar dissolve nonpolar","Hot solvents dissolve more solute","Large molecules dissolve small molecules"], correct:[1], explain:"Miscibility is driven by matching polarities and IMFs between solvent and solute." },
+];
+
+const CATS = ["All", ...new Set(questions.map(q => q.cat))];
+let pool = [], current = 0, score = 0, answered = 0, selectedOpts = new Set(), revealed = false, filter = "All", catScores = {};
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+function getPool() {
+  return filter === "All" ? pool : pool.filter(q => q.cat === filter);
+}
+
+function init() {
+  pool = shuffle(questions);
+  current = 0; score = 0; answered = 0;
+  catScores = {};
+  CATS.slice(1).forEach(c => catScores[c] = { s: 0, a: 0 });
+  buildFilters();
+  render();
+}
+
+function buildFilters() {
+  const row = document.getElementById('filter-row');
+  row.innerHTML = CATS.map(c =>
+    `<button class="filter-btn ${c === filter ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setFilter(f) {
+  filter = f; current = 0; score = 0; answered = 0;
+  pool = shuffle(questions);
+  buildFilters(); render();
+}
+
+function updateStats() {
+  const p = getPool();
+  document.getElementById('stat-score').textContent = `${score}/${answered}`;
+  document.getElementById('stat-q').textContent = `${Math.min(current + 1, p.length)}/${p.length}`;
+  const pct = p.length > 0 ? (current / p.length) * 100 : 0;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function render() {
+  const p = getPool();
+  updateStats();
+  if (p.length === 0) {
+    document.getElementById('game-area').innerHTML = `<div class="question-card" style="text-align:center;padding:40px"><p style="color:var(--muted)">No questions in this category.</p></div>`;
+    return;
+  }
+  if (current >= p.length) { renderEnd(p); return; }
+  const q = p[current];
+  const ga = document.getElementById('game-area');
+  let bodyHtml = '';
+  if (q.type === 'mc') {
+    bodyHtml = `
+      ${q.multi ? '<div class="multi-hint">Select all that apply</div>' : ''}
+      <div class="options" id="opts">
+        ${q.opts.map((o, i) => `<button class="opt-btn" id="opt${i}" onclick="selectOpt(${i})">
+          <span class="opt-letter">${String.fromCharCode(65+i)}</span>${o}
+        </button>`).join('')}
+      </div>
+      <div class="action-row">
+        <button class="btn-primary" onclick="submitMC()">Check answer</button>
+      </div>`;
+  } else {
+    bodyHtml = `
+      <div class="short-answer-area">
+        <textarea class="short-input" id="userinput" rows="3" placeholder="Type your answer…"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn-primary" onclick="revealAnswer()">Reveal answer</button>
+      </div>`;
+  }
+  ga.innerHTML = `
+    <div class="question-card">
+      <div class="q-meta">
+        <span class="cat-badge">${q.cat}</span>
+        <span class="type-badge">${q.type === 'mc' ? 'Multiple choice' : 'Short answer'}</span>
+      </div>
+      <div class="question-text">${q.q}</div>
+      ${bodyHtml}
+      <div id="feedback"></div>
+    </div>`;
+  selectedOpts = new Set();
+  revealed = false;
+}
+
+function selectOpt(i) {
+  if (revealed) return;
+  const q = getPool()[current];
+  if (q.multi) {
+    selectedOpts.has(i) ? selectedOpts.delete(i) : selectedOpts.add(i);
+  } else {
+    selectedOpts = new Set([i]);
+  }
+  document.querySelectorAll('.opt-btn').forEach((b, idx) => {
+    b.className = 'opt-btn' + (selectedOpts.has(idx) ? ' selected' : '');
+  });
+}
+
+function submitMC() {
+  if (revealed) { nextQ(); return; }
+  const q = getPool()[current];
+  const correctSet = new Set(q.correct);
+  const isRight = selectedOpts.size === correctSet.size && [...selectedOpts].every(x => correctSet.has(x));
+  revealed = true;
+  document.querySelectorAll('.opt-btn').forEach((b, i) => {
+    b.disabled = true; b.className = 'opt-btn';
+    if (correctSet.has(i)) b.classList.add('correct');
+    if (selectedOpts.has(i) && !correctSet.has(i)) b.classList.add('wrong');
+  });
+  if (isRight) { score++; catScores[q.cat] && catScores[q.cat].s++; }
+  answered++;
+  catScores[q.cat] && catScores[q.cat].a++;
+  updateStats();
+  document.getElementById('feedback').innerHTML = `
+    <div class="feedback ${isRight ? 'correct' : 'wrong'}">
+      <div class="fb-label">${isRight ? '✓ Correct' : '✗ Incorrect'}</div>
+      <div class="fb-explain">${q.explain}</div>
+    </div>
+    <div class="action-row"><button class="btn-primary" onclick="nextQ()">Next →</button></div>`;
+}
+
+function revealAnswer() {
+  if (revealed) { nextQ(); return; }
+  const q = getPool()[current];
+  revealed = true; answered++;
+  catScores[q.cat] && catScores[q.cat].a++;
+  const inp = document.getElementById('userinput');
+  if (inp) inp.disabled = true;
+  updateStats();
+  document.getElementById('feedback').innerHTML = `
+    <div class="feedback info">
+      <div class="fb-label">Answer</div>
+      ${q.answer}
+      ${q.explain ? `<div class="fb-explain">${q.explain}</div>` : ''}
+    </div>
+    <div class="action-row"><button class="btn-primary" onclick="nextQ()">Next →</button></div>`;
+}
+
+function nextQ() { current++; render(); }
+
+function renderEnd(p) {
+  document.getElementById('progress').style.width = '100%';
+  const pct = answered > 0 ? Math.round((score / answered) * 100) : 0;
+  const msg = pct >= 85 ? "Outstanding! You're ready for exam day." : pct >= 65 ? "Good work! Review the topics you missed and you'll be set." : "Keep at it — revisit the tricky topics and try again!";
+  const r = 54, circ = 2 * Math.PI * r;
+  const fill = circ - (pct / 100) * circ;
+  const colorStroke = pct >= 65 ? '#5fe6c8' : '#f5a623';
+
+  const breakdown = Object.entries(catScores)
+    .filter(([,v]) => v.a > 0)
+    .map(([cat, v]) => `<div class="breakdown-cell">
+      <div class="bc-cat">${cat}</div>
+      <div class="bc-val">${v.s}/${v.a}</div>
+    </div>`).join('');
+
+  document.getElementById('game-area').innerHTML = `
+    <div class="question-card end-screen">
+      <div class="end-ring">
+        <svg width="126" height="126" viewBox="0 0 126 126">
+          <circle cx="63" cy="63" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="3"/>
+          <circle cx="63" cy="63" r="${r}" fill="none" stroke="${colorStroke}" stroke-width="3"
+            stroke-dasharray="${circ}" stroke-dashoffset="${fill}" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-score">${pct}%</div>
+        <div class="ring-total">${score}/${answered}</div>
+      </div>
+      <div class="end-title">${pct >= 85 ? 'Excellent work' : pct >= 65 ? 'Good job' : 'Keep studying'}</div>
+      <div class="end-msg">${msg}</div>
+      ${breakdown ? `<div class="end-breakdown">${breakdown}</div>` : ''}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-primary" onclick="init()">Play again</button>
+        ${filter !== 'All' ? `<button class="btn-ghost" onclick="setFilter('All')">All categories</button>` : ''}
+      </div>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>

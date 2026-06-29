@@ -11,7 +11,7 @@ export default function Home() {
         </p>
         <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
           <Link href="/game" className="btn btn-primary">Play MedGuess →</Link>
-          <Link href="/timeline" className="btn btn-outline">Med School Timeline</Link>
+          <Link href="/planner.html" className="btn btn-outline">Med School Timeline</Link>
         </div>
       </section>
 
@@ -24,35 +24,35 @@ export default function Home() {
           <span className="card-tag">Daily Game</span>
         </Link>
 
-        <Link href="/mcat" className="card">
+        <Link href="/mcat.html" className="card">
           <span className="card-icon">📖</span>
           <div className="card-title">MCAT Review</div>
           <div className="card-desc">Flashcard-style concept review across Bio/Biochem, Chem/Physics, Psych, and CARS.</div>
           <span className="card-tag">Coming Soon</span>
         </Link>
 
-        <Link href="/courses/biol240" className="card">
+        <Link href="/biol240.html" className="card">
           <span className="card-icon">🧬</span>
           <div className="card-title">BIOL 240</div>
           <div className="card-desc">Genetics & Molecular Biology. UNC-specific study guides, concept sheets, and exam tips.</div>
           <span className="card-tag">UNC Course</span>
         </Link>
 
-        <Link href="/courses/chem101" className="card">
+        <Link href="/chem101.html" className="card">
           <span className="card-icon">⚗️</span>
           <div className="card-title">CHEM 101 / 102</div>
           <div className="card-desc">General Chemistry I & II. Formulas, reaction types, and problem sets tailored to UNC exams.</div>
           <span className="card-tag">UNC Course</span>
         </Link>
 
-        <Link href="/courses/chem101l" className="card">
+        <Link href="/chem101l.html" className="card">
           <span className="card-icon">🔬</span>
           <div className="card-title">CHEM 101L</div>
           <div className="card-desc">Lab techniques, safety, and data analysis — everything you need before your lab section.</div>
           <span className="card-tag">UNC Course</span>
         </Link>
 
-        <Link href="/timeline" className="card">
+        <Link href="/planner.html" className="card">
           <span className="card-icon">📅</span>
           <div className="card-title">Med School Timeline</div>
           <div className="card-desc">When to shadow, when to take the MCAT, AMCAS deadlines, and everything in between.</div>

@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 const links = [
   { href: '/', label: 'Home' },
   { href: '/game', label: '🩺 MedGuess' },
-  { href: '/mcat', label: 'MCAT' },
-  { href: '/courses/biol240', label: 'BIOL 240' },
-  { href: '/courses/chem101', label: 'CHEM 101' },
-  { href: '/courses/chem102', label: 'CHEM 102' },
-  { href: '/courses/chem101l', label: 'CHEM 101L' },
-  { href: '/timeline', label: 'Timeline' },
+  { href: '/mcat.html', label: 'MCAT' },
+  { href: '/biol240.html', label: 'BIOL 240' },
+  { href: '/chem101.html', label: 'CHEM 101' },
+  { href: '/chem101-quiz.html', label: 'CHEM 101 Quiz' },
+  { href: '/chem101l.html', label: 'CHEM 101L' },
+  { href: '/planner.html', label: 'Timeline' },
   { href: '/resources', label: '🛒 Resources' },
 ];
 

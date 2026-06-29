@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premed Planner — Coursework & MCAT Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4efe6;
+    --paper-deep: #ebe4d6;
+    --ink: #1a2230;
+    --ink-soft: #3a4658;
+    --ink-mute: #6b7689;
+    --accent: #8b3a2f;     /* oxblood */
+    --accent-soft: #b85742;
+    --gold: #b88a3e;
+    --green: #4a6b3a;
+    --rule: #c8bfaf;
+    --shadow: 26 34 48;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(139,58,47,0.04), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(184,138,62,0.05), transparent 55%);
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+  }
+
+  .masthead-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .masthead-eyebrow span:first-child { color: var(--accent); }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(38px, 5vw, 58px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+
+  .masthead-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+  }
+  .masthead-meta strong {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* ===== TAB NAV ===== */
+  nav.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tab {
+    background: none;
+    border: none;
+    padding: 14px 22px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--accent); }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+  .tab-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-right: 8px;
+  }
+
+  /* ===== SECTIONS ===== */
+  section { display: none; animation: fadeIn 0.4s ease; }
+  section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-intro {
+    max-width: 680px;
+    margin-bottom: 36px;
+  }
+  .section-intro h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 28px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .section-intro p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ===== SCHOOLS ===== */
+  .schools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .school-card {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--rule);
+    padding: 26px 24px 22px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .school-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px -16px rgb(var(--shadow) / 0.18);
+  }
+
+  .school-tag {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    text-transform: uppercase;
+  }
+  .school-tag.competitive { background: var(--accent); }
+  .school-tag.in-state { background: var(--green); }
+  .school-tag.accessible { background: var(--gold); }
+  .school-tag.do-school { background: #4a5d6f; }
+
+  .school-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    padding-right: 90px;
+  }
+  .school-loc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink-mute);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .school-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 3px;
+  }
+  .stat-val {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--ink);
+  }
+
+  .prereq-heading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+  }
+  .prereq-list {
+    list-style: none;
+    margin-bottom: 16px;
+  }
+  .prereq-list li {
+    padding: 7px 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .prereq-list li:last-child { border-bottom: none; }
+  .prereq-list li::before {
+    content: '·';
+    font-size: 22px;
+    line-height: 1;
+    color: var(--accent);
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .prereq-list li.recommended::before { color: var(--gold); }
+
+  .school-notes {
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    font-style: italic;
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .school-notes strong {
+    font-style: normal;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  /* Schools filter legend */
+  .schools-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.4);
+    border: 1px solid var(--rule);
+    align-items: center;
+  }
+  .schools-legend-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-right: 6px;
+  }
+  .legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .legend-dot.competitive { background: var(--accent); }
+  .legend-dot.in-state { background: var(--green); }
+  .legend-dot.accessible { background: var(--gold); }
+  .legend-dot.do-school { background: #4a5d6f; }
+  .legend-dot.regional { background: var(--ink-mute); }
+
+  /* ===== TRACKER ===== */
+  .tracker-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .summary-card {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid var(--rule);
+    padding: 18px 20px;
+  }
+  .summary-num {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .summary-num em {
+    font-size: 18px;
+    color: var(--ink-mute);
+    font-style: normal;
+    font-weight: 300;
+  }
+  .summary-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+
+  .tracker-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .tracker-cat {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--rule);
+    padding: 22px 22px 16px;
+  }
+  .tracker-cat h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .tracker-cat h3 .cat-prog {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  .course-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .course-row input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--ink-mute);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+  .course-row input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .course-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--paper);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .course-name {
+    font-size: 14px;
+    color: var(--ink-soft);
+    flex: 1;
+  }
+  .course-row input[type="checkbox"]:checked + .course-name {
+    color: var(--ink-mute);
+    text-decoration: line-through;
+    text-decoration-color: var(--rule);
+  }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    cursor: pointer;
+    margin-top: 24px;
+    transition: all 0.2s ease;
+  }
+  .reset-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ===== MCAT TIMELINE ===== */
+  .timeline-controls {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--rule);
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 600px) { .timeline-controls { grid-template-columns: 1fr; } }
+
+  .control-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .control-group select, .control-group input {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 10px 12px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .control-group select:focus, .control-group input:focus {
+    border-color: var(--accent);
+  }
+
+  .recommendation-box {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 32px 36px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .recommendation-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-soft);
+  }
+  .rec-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    margin-bottom: 14px;
+  }
+  .rec-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .rec-headline em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .rec-body {
+    color: rgba(244,239,230,0.78);
+    font-size: 14.5px;
+    line-height: 1.65;
+    max-width: 620px;
+  }
+
+  /* Timeline visualization */
+  .timeline-viz {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--rule);
+    padding: 32px 28px;
+    margin-bottom: 24px;
+  }
+  .timeline-viz h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .tl-track {
+    position: relative;
+    padding: 20px 0 60px;
+  }
+  .tl-line {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--rule);
+  }
+  .tl-fill {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+  .tl-marker {
+    position: absolute;
+    top: 24px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink-mute);
+    transform: translateX(-50%);
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+  .tl-marker.done { background: var(--accent); border-color: var(--accent); }
+  .tl-marker.current {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(184,138,62,0.2);
+  }
+  .tl-label {
+    position: absolute;
+    top: 50px;
+    transform: translateX(-50%);
+    width: 110px;
+    text-align: center;
+  }
+  .tl-label .tl-when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .tl-label .tl-what {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.25;
+  }
+
+  /* Milestone cards */
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .milestone {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--rule);
+    padding: 20px 22px;
+    position: relative;
+  }
+  .milestone-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 32px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .milestone h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .milestone p {
+    font-size: 13px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+  }
+
+  /* ===== TIMING GUIDE ===== */
+  .guide-content {
+    max-width: 760px;
+  }
+  .guide-content h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 32px 0 14px;
+    letter-spacing: -0.01em;
+  }
+  .guide-content h3:first-child { margin-top: 0; }
+  .guide-content p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+  .guide-content ul {
+    list-style: none;
+    margin-bottom: 18px;
+  }
+  .guide-content ul li {
+    padding: 8px 0 8px 20px;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    position: relative;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .guide-content ul li:last-child { border-bottom: none; }
+  .guide-content ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--accent);
+    padding: 12px 0 12px 24px;
+    margin: 28px 0;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .container { padding: 32px 20px 64px; }
+    header { grid-template-columns: 1fr; }
+    .masthead-meta { text-align: left; }
+    nav.tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 12px 14px; font-size: 12px; }
+    .tab-num { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div>
+      <div class="masthead-eyebrow">
+        <span>○ Vol. I</span>
+        <span>The Premed Almanac</span>
+      </div>
+      <h1>A planner for the<br><em>long</em> road to medicine.</h1>
+    </div>
+    <div class="masthead-meta">
+      Coursework · MCAT · Timeline
+      <strong>Updated for the 2026–27 cycle</strong>
+    </div>
+  </header>
+
+  <!-- ===== TAB NAV ===== -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="schools"><span class="tab-num">01</span>Schools</button>
+    <button class="tab" data-tab="tracker"><span class="tab-num">02</span>Course Tracker</button>
+    <button class="tab" data-tab="mcat"><span class="tab-num">03</span>MCAT Timeline</button>
+    <button class="tab" data-tab="guide"><span class="tab-num">04</span>Timing Guide</button>
+  </nav>
+
+  <!-- ===== SECTION 1: SCHOOLS ===== -->
+  <section id="schools" class="active">
+    <div class="section-intro">
+      <h2>Prerequisites at a glance.</h2>
+      <p>A snapshot of coursework expectations across a balanced range of schools — from competitive reaches to more accessible targets, plus a few DO programs worth considering. Solid red dots are required; gold dots are recommended or strongly encouraged. Tags in the corner mark the rough competitiveness tier.</p>
+    </div>
+    <div class="schools-legend">
+      <span class="schools-legend-label">Tier key</span>
+      <span class="legend-chip"><span class="legend-dot competitive"></span>Highly competitive</span>
+      <span class="legend-chip"><span class="legend-dot in-state"></span>In-state focus</span>
+      <span class="legend-chip"><span class="legend-dot regional"></span>Regional</span>
+      <span class="legend-chip"><span class="legend-dot accessible"></span>More accessible</span>
+      <span class="legend-chip"><span class="legend-dot do-school"></span>DO program</span>
+    </div>
+    <div class="schools-grid" id="schoolsGrid"></div>
+  </section>
+
+  <!-- ===== SECTION 2: TRACKER ===== -->
+  <section id="tracker">
+    <div class="section-intro">
+      <h2>Your course tracker.</h2>
+      <p>Tick off prerequisites as you complete them. Your progress saves automatically and feeds into the MCAT timeline calculator. The categories below cover the union of requirements across the listed schools.</p>
+    </div>
+    <div class="tracker-summary" id="trackerSummary"></div>
+    <div class="tracker-categories" id="trackerCategories"></div>
+    <button class="reset-btn" id="resetBtn">Reset progress</button>
+  </section>
+
+  <!-- ===== SECTION 3: MCAT ===== -->
+  <section id="mcat">
+    <div class="section-intro">
+      <h2>When should you take the MCAT?</h2>
+      <p>The recommendation below adapts to your coursework progress and target application year. The MCAT is content-heavy — most schools want to see at least gen chem, orgo I, biology, biochem, psych/soc, and ideally physics behind you before you sit it.</p>
+    </div>
+
+    <div class="timeline-controls">
+      <div class="control-group">
+        <label>Current year in school</label>
+        <select id="yearSel">
+          <option value="freshman">Freshman</option>
+          <option value="sophomore" selected>Sophomore</option>
+          <option value="junior">Junior</option>
+          <option value="senior">Senior</option>
+          <option value="postbac">Post-bac / gap year</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Target medical school matriculation year</label>
+        <select id="matricSel">
+          <option value="2027">Fall 2027</option>
+          <option value="2028" selected>Fall 2028</option>
+          <option value="2029">Fall 2029</option>
+          <option value="2030">Fall 2030</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="recommendation-box" id="recBox">
+      <div class="rec-eyebrow">Your recommendation</div>
+      <div class="rec-headline" id="recHeadline">Calculating…</div>
+      <div class="rec-body" id="recBody"></div>
+    </div>
+
+    <div class="timeline-viz">
+      <h3>Your application timeline</h3>
+      <div class="tl-track" id="timelineTrack"></div>
+    </div>
+
+    <div class="milestones" id="milestones"></div>
+  </section>
+
+  <!-- ===== SECTION 4: GUIDE ===== -->
+  <section id="guide">
+    <div class="section-intro">
+      <h2>The timing playbook.</h2>
+      <p>Plain-language guidance for sequencing the science core, the MCAT, and the application itself.</p>
+    </div>
+
+    <div class="guide-content">
+      <h3>The "minus two" rule</h3>
+      <p>Medical school applications open in early May, two years before you'd matriculate. So if you want to start med school in Fall 2028, you apply in Summer 2027, which means your MCAT score should be in hand by roughly <strong>April–June 2027</strong>. Working backwards from there is the entire game.</p>
+
+      <p class="pull-quote">"Apply early" is not a slogan — it's the single biggest factor under your control. Rolling admissions means a complete July application is meaningfully stronger than the same application submitted in October.</p>
+
+      <h3>What to finish before MCAT day</h3>
+      <p>The exam covers four sections: Bio/Biochem, Chem/Phys, Psych/Soc, and CARS (critical reading). To not be guessing your way through content, finish:</p>
+      <ul>
+        <li>General chemistry (both semesters) and organic chemistry I — minimum</li>
+        <li>Introductory biology (both semesters)</li>
+        <li>Biochemistry — non-negotiable, this is roughly 25% of the exam</li>
+        <li>Introductory psychology and sociology — easy points if covered</li>
+        <li>Physics I and II — physics shows up across both science sections</li>
+      </ul>
+      <p>Organic II is helpful but not strictly required for the MCAT itself. Many students take it after the test.</p>
+
+      <h3>Study runways that actually work</h3>
+      <p>Most successful students do <strong>3–4 months of dedicated study</strong>, somewhere between 300 and 500 hours total. Two common patterns:</p>
+      <ul>
+        <li><strong>The summer sprint:</strong> 8–10 weeks at 40+ hours/week, taken between sophomore and junior summer or the summer before applying. Intense but contained.</li>
+        <li><strong>The split runway:</strong> Light content review during a spring semester (10–15 hrs/week), then a 2-month full-time push into a May/June test date.</li>
+      </ul>
+      <p>If you're juggling a full course load and meaningful clinical hours, the split runway tends to fail less often.</p>
+
+      <h3>The traditional vs. gap-year fork</h3>
+      <p><strong>Traditional path</strong> (matriculate right after senior year): MCAT by spring of junior year, apply that summer. This requires being deep into the science sequence by the end of sophomore year — biochem usually means front-loading orgo.</p>
+      <p><strong>One or two gap years</strong> (the more common path now — over 70% of matriculants take at least one): MCAT in the summer or fall after junior year, or even after graduating. More room for clinical hours, research, and a polished application. Schools do not penalize gap years; many actively prefer the maturity.</p>
+
+      <h3>Things often missed by sophomores</h3>
+      <ul>
+        <li>UNC and ECU don't accept AP credit for prerequisites — you'll need to take the actual courses or upper-level replacements</li>
+        <li>ECU requires 5-year-fresh science coursework (measured from your graduation date)</li>
+        <li>Most schools want at least some clinical patient-facing hours; ECU expects them at the time of application</li>
+        <li>UNC requires two upper-level biology courses plus biochemistry — not just the intro sequence</li>
+        <li>Statistics is required or recommended at most schools and is increasingly common as a standalone prereq</li>
+      </ul>
+
+      <h3>MD vs. DO — and why DO belongs on your list</h3>
+      <p>DO programs (Doctor of Osteopathic Medicine) graduate physicians who practice identically to MDs across all 50 states — same residencies, same licensure, same scope of practice. The only meaningful differences for an applicant: DO schools place additional emphasis on osteopathic manipulative medicine in their curriculum, use AACOMAS instead of AMCAS, and on average accept students with lower stats (national DO average MCAT ~503, GPA ~3.60 vs. MD ~512, ~3.79).</p>
+      <p>For a balanced school list, pre-health advisors increasingly recommend including 4–8 DO programs alongside your MD applications, especially if your stats sit at or below the MD national averages. A DO acceptance is not a consolation prize — it's a real path to any specialty you want, and matriculants generally have stronger primary-care match outcomes than DO stats alone would suggest.</p>
+      <p>One caveat: a small number of highly competitive specialties (some surgical subspecialties, dermatology, top-tier academic radiology) historically favor MD applicants. If you're certain about one of those, weight your list toward MD. For everything else, DO is functionally equivalent.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Premed Almanac · planning tool, not legal/admissions advice</span>
+    <span>Verify all requirements directly with each school</span>
+  </footer>
+
+</div>
+
+<script>
+  // ============================================================
+  // DATA
+  // ============================================================
+  const SCHOOLS = [
+    {
+      name: "UNC Chapel Hill SOM",
+      loc: "Chapel Hill, NC",
+      tag: "In-state focus",
+      tagClass: "in-state",
+      stats: { gpa: "3.82", mcat: "516", inState: "~85%" },
+      required: [
+        "8 hrs General Biology + lab",
+        "8 hrs General Chemistry + lab",
+        "8 hrs Organic Chemistry + lab",
+        "8 hrs Physics + lab",
+        "Biochemistry",
+        "Two upper-level Biology courses (one with lab)",
+        "6 hrs English"
+      ],
+      recommended: [
+        "Statistics",
+        "Calculus (some schools require)",
+        "Humanities coursework"
+      ],
+      notes: "AP credit not accepted. Prereqs (esp. upper-level bio + biochem) must be within 3 years of matriculation. In-person strongly preferred over online."
+    },
+    {
+      name: "ECU Brody SOM",
+      loc: "Greenville, NC",
+      tag: "NC residents only",
+      tagClass: "in-state",
+      stats: { gpa: "3.73", mcat: "507", inState: "~95%" },
+      required: [
+        "1 yr General Biology + lab (2 bio labs required)",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr General Physics + lab",
+        "Biochemistry",
+        "1 yr English / writing-intensive"
+      ],
+      recommended: [
+        "Statistics or Biostatistics",
+        "Psychology, Sociology",
+        "Upper-level bio (anatomy, genetics, microbio, etc.)"
+      ],
+      notes: "Restricted to NC residents or recent UNC-system grads (within 5 yrs). No AP credit, no online prereqs. Science coursework must be within 5 yrs of graduation. Patient-facing clinical hours required at time of application. Min MCAT 500."
+    },
+    {
+      name: "Duke School of Medicine",
+      loc: "Durham, NC",
+      tag: "Highly competitive",
+      tagClass: "competitive",
+      stats: { gpa: "3.89", mcat: "519", inState: "~15%" },
+      required: [
+        "Biochemistry (or covered via cell/molecular bio)",
+        "Cell/Molecular Biology or Genetics",
+        "General Chemistry, Organic Chemistry",
+        "Physics or Biophysics",
+        "Statistics or Biostatistics"
+      ],
+      recommended: [
+        "Psychology",
+        "Sociology",
+        "Substantial expository writing across humanities"
+      ],
+      notes: "Frames requirements as 'academic expectations' — competency-based rather than rigid course list. Min MCAT 500 to be reviewed; matriculants average 519. Compressed 1-year preclinical curriculum demands strong prep."
+    },
+    {
+      name: "Wake Forest SOM",
+      loc: "Winston-Salem, NC",
+      tag: "Recommended only",
+      tagClass: "",
+      stats: { gpa: "3.85", mcat: "512", inState: "varies" },
+      required: [
+        "No strictly required courses — MCAT demonstrates competency"
+      ],
+      recommended: [
+        "Intro Biology + advanced (genetics, anatomy, physiology, neuro)",
+        "General + Organic Chemistry, Biochemistry",
+        "Two semesters Physics (calculus-based at WF)",
+        "Statistics, Algebra",
+        "Psychology, Sociology, Philosophy",
+        "Foreign language (esp. Spanish), literature"
+      ],
+      recommendedOnly: true,
+      notes: "No strict course requirements but min 500 MCAT and 3.2 BCPM GPA to be sent secondary. CASPer required. US citizens/permanent residents only; no transfer admits."
+    },
+    {
+      name: "U. of South Carolina SOM",
+      loc: "Columbia, SC",
+      tag: "Regional",
+      tagClass: "",
+      stats: { gpa: "3.70", mcat: "510", inState: "~80%" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry",
+        "Genetics, Cell Biology",
+        "Statistics",
+        "Psychology / Sociology"
+      ],
+      notes: "Strong in-state preference. Traditional course requirements. Including for context as a typical regional medical school you can compare against the others."
+    },
+    {
+      name: "Virginia Commonwealth U.",
+      loc: "Richmond, VA",
+      tag: "Regional",
+      tagClass: "",
+      stats: { gpa: "3.79", mcat: "513", inState: "~50%" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab (or 1 sem orgo + biochem)",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry",
+        "Statistics",
+        "Behavioral / social science"
+      ],
+      notes: "Accepts a 1 semester orgo + 1 semester biochem combination in lieu of a full year of orgo. More OOS-friendly than UNC/ECU."
+    },
+    {
+      name: "Mercer U. School of Medicine",
+      loc: "Macon / Savannah / Columbus, GA",
+      tag: "More accessible",
+      tagClass: "accessible",
+      stats: { gpa: "3.69", mcat: "505", inState: "100%" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry",
+        "Genetics, microbiology, anatomy",
+        "Statistics",
+        "Behavioral / social sciences"
+      ],
+      notes: "Georgia residents only. Mission focused on training rural and underserved-area physicians — strong fit if you're committed to primary care. Lower stat thresholds than typical MD programs but in-state requirement is strict."
+    },
+    {
+      name: "Marshall U. (Joan C. Edwards SOM)",
+      loc: "Huntington, WV",
+      tag: "More accessible",
+      tagClass: "accessible",
+      stats: { gpa: "3.74", mcat: "505", inState: "~70%" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry",
+        "Behavioral sciences",
+        "Statistics, genetics, anatomy"
+      ],
+      notes: "WV residents preferred but accepts a meaningful share of OOS students with regional ties. One of the more accessible MD programs by stats. Strong rural/primary care mission."
+    },
+    {
+      name: "Campbell U. (CUSOM)",
+      loc: "Lillington, NC",
+      tag: "DO program",
+      tagClass: "do-school",
+      stats: { gpa: "3.61", mcat: "504", inState: "~50% NC/SE" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry (strongly)",
+        "Genetics, microbiology, anatomy/physiology",
+        "Behavioral / social sciences",
+        "Statistics"
+      ],
+      notes: "NC's only osteopathic medical school. Prefers SE applicants. Accepts both AMCAS and AACOMAS. Min 496 MCAT for review. DO degree practices identically to MD across all 50 states; admissions stats are lower than MD averages."
+    },
+    {
+      name: "LECOM (Lake Erie COM)",
+      loc: "Erie, PA / Bradenton, FL / Elmira, NY",
+      tag: "DO program",
+      tagClass: "do-school",
+      stats: { gpa: "3.55", mcat: "503", inState: "~30%" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry",
+        "Behavioral sciences",
+        "Microbiology, anatomy, physiology"
+      ],
+      notes: "One of the largest and most accessible DO programs nationally. Lower stat thresholds — competitive at MCAT 500+. Three campuses with different curriculum tracks (lecture, problem-based, independent study). Solid match outcomes despite accessible admissions."
+    },
+    {
+      name: "Edward Via COM (VCOM)",
+      loc: "Multiple campuses (VA, NC, SC, AL, LA)",
+      tag: "DO program",
+      tagClass: "do-school",
+      stats: { gpa: "3.55", mcat: "503", inState: "varies" },
+      required: [
+        "1 yr Biology + lab",
+        "1 yr General Chemistry + lab",
+        "1 yr Organic Chemistry + lab",
+        "1 yr Physics + lab",
+        "1 yr English"
+      ],
+      recommended: [
+        "Biochemistry (strongly)",
+        "Genetics, microbiology, anatomy",
+        "Behavioral sciences"
+      ],
+      notes: "Has a Spartanburg, SC campus and Auburn, AL campus serving the Southeast. Mission-driven toward rural/Appalachian medicine. Min 494 MCAT. Accessible stats with strong primary care match outcomes."
+    }
+  ];
+
+  // Master prerequisite tracker (union of common requirements)
+  const PREREQS = {
+    "Biology": [
+      { id: "bio1", name: "General Biology I + lab" },
+      { id: "bio2", name: "General Biology II + lab" },
+      { id: "bioUpper1", name: "Upper-level Biology I (genetics, cell, etc.)" },
+      { id: "bioUpper2", name: "Upper-level Biology II" }
+    ],
+    "Chemistry": [
+      { id: "gchem1", name: "General Chemistry I + lab" },
+      { id: "gchem2", name: "General Chemistry II + lab" },
+      { id: "ochem1", name: "Organic Chemistry I + lab" },
+      { id: "ochem2", name: "Organic Chemistry II + lab" },
+      { id: "biochem", name: "Biochemistry" }
+    ],
+    "Physics & Math": [
+      { id: "phys1", name: "Physics I + lab" },
+      { id: "phys2", name: "Physics II + lab" },
+      { id: "calc", name: "Calculus" },
+      { id: "stats", name: "Statistics" }
+    ],
+    "Humanities & Social Science": [
+      { id: "eng1", name: "English / writing-intensive (1)" },
+      { id: "eng2", name: "English / writing-intensive (2)" },
+      { id: "psych", name: "Psychology" },
+      { id: "soc", name: "Sociology" }
+    ]
+  };
+
+  // The MCAT-critical subset
+  const MCAT_CRITICAL = ["bio1", "bio2", "gchem1", "gchem2", "ochem1", "biochem", "phys1", "phys2", "psych", "soc"];
+
+  // ============================================================
+  // STATE (in-memory; persists during session)
+  // ============================================================
+  const state = {
+    completed: {},
+    year: "sophomore",
+    matric: "2028"
+  };
+
+  // Initialize
+  Object.values(PREREQS).flat().forEach(p => state.completed[p.id] = false);
+
+  // ============================================================
+  // RENDER: SCHOOLS
+  // ============================================================
+  function renderSchools() {
+    const grid = document.getElementById('schoolsGrid');
+    grid.innerHTML = SCHOOLS.map(s => `
+      <article class="school-card">
+        ${s.tag ? `<span class="school-tag ${s.tagClass}">${s.tag}</span>` : ''}
+        <h3 class="school-name">${s.name}</h3>
+        <div class="school-loc">${s.loc}</div>
+        <div class="school-stats">
+          <div class="stat-item">
+            <div class="stat-label">Avg GPA</div>
+            <div class="stat-val">${s.stats.gpa}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Avg MCAT</div>
+            <div class="stat-val">${s.stats.mcat}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">In-State</div>
+            <div class="stat-val">${s.stats.inState}</div>
+          </div>
+        </div>
+        ${s.recommendedOnly ? '' : `
+          <div class="prereq-heading">Required</div>
+          <ul class="prereq-list">
+            ${s.required.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        `}
+        <div class="prereq-heading">${s.recommendedOnly ? 'Recommended' : 'Recommended'}</div>
+        <ul class="prereq-list">
+          ${s.recommended.map(r => `<li class="recommended">${r}</li>`).join('')}
+        </ul>
+        <div class="school-notes"><strong>Notes:</strong> ${s.notes}</div>
+      </article>
+    `).join('');
+  }
+
+  // ============================================================
+  // RENDER: TRACKER
+  // ============================================================
+  function renderTracker() {
+    const allCourses = Object.values(PREREQS).flat();
+    const totalDone = allCourses.filter(c => state.completed[c.id]).length;
+    const mcatDone = MCAT_CRITICAL.filter(id => state.completed[id]).length;
+
+    // Summary
+    document.getElementById('trackerSummary').innerHTML = `
+      <div class="summary-card">
+        <div class="summary-num">${totalDone}<em> / ${allCourses.length}</em></div>
+        <div class="summary-label">Prerequisites complete</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num">${mcatDone}<em> / ${MCAT_CRITICAL.length}</em></div>
+        <div class="summary-label">MCAT-critical courses</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num">${Math.round(totalDone / allCourses.length * 100)}<em>%</em></div>
+        <div class="summary-label">Overall completion</div>
+      </div>
+    `;
+
+    // Categories
+    document.getElementById('trackerCategories').innerHTML = Object.entries(PREREQS).map(([cat, courses]) => {
+      const done = courses.filter(c => state.completed[c.id]).length;
+      return `
+        <div class="tracker-cat">
+          <h3>${cat}<span class="cat-prog">${done}/${courses.length}</span></h3>
+          ${courses.map(c => `
+            <label class="course-row">
+              <input type="checkbox" data-id="${c.id}" ${state.completed[c.id] ? 'checked' : ''}>
+              <span class="course-name">${c.name}</span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+    }).join('');
+
+    // Wire checkboxes
+    document.querySelectorAll('.course-row input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', e => {
+        state.completed[e.target.dataset.id] = e.target.checked;
+        renderTracker();
+        renderMCAT();
+      });
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Reset all course progress?')) {
+      Object.keys(state.completed).forEach(k => state.completed[k] = false);
+      renderTracker();
+      renderMCAT();
+    }
+  });
+
+  // ============================================================
+  // MCAT TIMELINE LOGIC
+  // ============================================================
+  function getMCATRecommendation() {
+    const matricYear = parseInt(state.matric);
+    const applyYear = matricYear - 1;       // e.g. 2027
+    const idealMCATWindow = `Mar–Jun ${applyYear}`;
+    const latestMCATWindow = `Jul–Sep ${applyYear}`;
+
+    const mcatDone = MCAT_CRITICAL.filter(id => state.completed[id]).length;
+    const mcatRatio = mcatDone / MCAT_CRITICAL.length;
+
+    // What's missing
+    const missing = MCAT_CRITICAL
+      .filter(id => !state.completed[id])
+      .map(id => Object.values(PREREQS).flat().find(c => c.id === id).name);
+
+    let headline, body, status;
+
+    if (mcatRatio >= 0.9) {
+      status = "ready";
+      headline = `Aim for the <em>spring before</em> you apply.`;
+      body = `You've finished ${mcatDone} of ${MCAT_CRITICAL.length} MCAT-critical courses — you're in good shape to start dedicated study now or soon. Target a test date in <strong>${idealMCATWindow}</strong>. Plan a 3–4 month dedicated study window (300–500 hours total). Sitting before May means your scored application can be submitted on day-one of the cycle, which is the single biggest controllable advantage.`;
+    } else if (mcatRatio >= 0.6) {
+      status = "soon";
+      headline = `Finish the remaining science core <em>first</em>.`;
+      const missingShort = missing.slice(0, 3).join(", ") + (missing.length > 3 ? "…" : "");
+      body = `You've completed ${mcatDone}/${MCAT_CRITICAL.length} MCAT-critical courses. Still pending: ${missingShort}. Don't sit the MCAT until you're through these — guessing on 25% of the exam is not a strategy. Aim to wrap them by the end of next academic year, then begin dedicated study targeting <strong>${idealMCATWindow}</strong> or <strong>${latestMCATWindow}</strong> at the latest.`;
+    } else if (mcatRatio >= 0.3) {
+      status = "early";
+      headline = `Too early to plan an MCAT date.`;
+      body = `Only ${mcatDone}/${MCAT_CRITICAL.length} MCAT-critical courses are done. Focus on coursework — particularly biochemistry, which is roughly a quarter of the exam and almost always taken after gen chem and orgo I. Revisit this page once you're at 80%+ of the MCAT-critical list. Realistically, you're looking at a test date 12–24 months out, which probably means a <strong>gap year</strong> in your plan.`;
+    } else {
+      status = "very-early";
+      headline = `Build the science foundation first.`;
+      body = `You haven't yet completed most of the MCAT-relevant prerequisites. That's normal at this stage — your job right now is coursework, GPA, and starting to build clinical hours. Don't even think about an MCAT date until biochem, both semesters of gen chem, orgo I, both semesters of bio, and physics are behind you. Tracking suggests a gap year before matriculation is highly likely.`;
+    }
+
+    return { headline, body, status, idealMCATWindow, latestMCATWindow, mcatRatio, applyYear, matricYear };
+  }
+
+  function renderMCAT() {
+    const rec = getMCATRecommendation();
+
+    document.getElementById('recHeadline').innerHTML = rec.headline;
+    document.getElementById('recBody').innerHTML = rec.body;
+
+    // Build timeline
+    const matric = rec.matricYear;
+    const apply = rec.applyYear;
+    const stages = [
+      { label: "Prereqs in progress", when: "now", done: rec.mcatRatio > 0.1 },
+      { label: "Finish MCAT-critical courses", when: `By Dec ${apply - 1}`, done: rec.mcatRatio >= 0.9, current: rec.mcatRatio < 0.9 && rec.mcatRatio > 0.3 },
+      { label: "MCAT dedicated study", when: `Jan–Apr ${apply}`, done: false, current: rec.mcatRatio >= 0.9 },
+      { label: "Take MCAT", when: rec.idealMCATWindow, done: false },
+      { label: "Submit AMCAS", when: `Jun ${apply}`, done: false },
+      { label: "Secondaries & interviews", when: `Aug–Mar`, done: false },
+      { label: "Matriculate", when: `Aug ${matric}`, done: false }
+    ];
+
+    const totalDone = stages.filter(s => s.done).length;
+    const fillPct = (totalDone / (stages.length - 1)) * 100;
+
+    const trackHTML = `
+      <div class="tl-line"></div>
+      <div class="tl-fill" style="width: ${fillPct}%"></div>
+      ${stages.map((s, i) => {
+        const pct = (i / (stages.length - 1)) * 100;
+        const cls = s.done ? 'done' : (s.current ? 'current' : '');
+        return `
+          <div class="tl-marker ${cls}" style="left: ${pct}%"></div>
+          <div class="tl-label" style="left: ${pct}%">
+            <div class="tl-when">${s.when}</div>
+            <div class="tl-what">${s.label}</div>
+          </div>
+        `;
+      }).join('')}
+    `;
+    document.getElementById('timelineTrack').innerHTML = trackHTML;
+
+    // Milestones
+    const milestones = [
+      {
+        n: "I",
+        title: "Lock down biochemistry",
+        body: "Roughly 25% of the MCAT touches biochem. It's typically taken after gen chem + orgo I. Plan this carefully — it gates everything."
+      },
+      {
+        n: "II",
+        title: "Build clinical hours early",
+        body: "ECU expects patient-facing experience at time of application. Aim for 100+ hours by junior year, ideally 200+ before applying. Scribing and CNA work count strongly."
+      },
+      {
+        n: "III",
+        title: rec.mcatRatio >= 0.9 ? `Schedule the MCAT for ${rec.idealMCATWindow}` : "Map out remaining prereqs",
+        body: rec.mcatRatio >= 0.9
+          ? "Register early — March/April slots fill up. AAMC official prep + UWorld + Anki is the standard stack. Take 5+ full-length practice tests."
+          : "Map your remaining MCAT-critical courses across the next 2–3 semesters. Don't bunch all the heavy science into one term."
+      },
+      {
+        n: "IV",
+        title: "Apply on day one",
+        body: `AMCAS opens early May ${rec.applyYear}; verified apps go out from late June. Submitting in June vs. October is the difference between an early interview and a wait-listed cycle.`
+      }
+    ];
+
+    document.getElementById('milestones').innerHTML = milestones.map(m => `
+      <div class="milestone">
+        <div class="milestone-num">${m.n}</div>
+        <h4>${m.title}</h4>
+        <p>${m.body}</p>
+      </div>
+    `).join('');
+  }
+
+  // ============================================================
+  // TAB SWITCHING
+  // ============================================================
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ============================================================
+  // CONTROL HANDLERS
+  // ============================================================
+  document.getElementById('yearSel').addEventListener('change', e => {
+    state.year = e.target.value;
+    renderMCAT();
+  });
+  document.getElementById('matricSel').addEventListener('change', e => {
+    state.matric = e.target.value;
+    renderMCAT();
+  });
+
+  // ============================================================
+  // PERSISTENCE (in-memory only — won't persist across reloads)
+  // ============================================================
+  // Note: localStorage is unavailable in this artifact environment, so
+  // progress persists during the session but resets on page reload.
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  renderSchools();
+  renderTracker();
+  renderMCAT();
+</script>
+</body>
+</html>
