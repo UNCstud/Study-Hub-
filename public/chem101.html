@@ -1566,6 +1566,25 @@
 </style>
 </head>
 <body>
+<style>
+.mg-nav{position:sticky;top:0;z-index:9999;background:rgba(10,14,20,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);padding:0 20px;height:52px;display:flex;align-items:center;gap:4px;font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;}
+.mg-nav-logo{font-size:0.95rem;font-weight:700;color:#3b82f6;letter-spacing:-0.5px;margin-right:8px;text-decoration:none;white-space:nowrap;}
+.mg-nav-logo span{color:#10b981;}
+.mg-nav a{font-size:0.75rem;font-weight:500;color:#8fa3bc;padding:5px 9px;border-radius:6px;text-decoration:none;transition:all 0.15s;white-space:nowrap;}
+.mg-nav a:hover{color:#e8edf5;background:#182030;}
+@media(max-width:600px){.mg-nav{gap:2px;padding:0 10px;overflow-x:auto;}.mg-nav a{font-size:0.68rem;padding:4px 6px;}}
+</style>
+<div class="mg-nav">
+  <a href="/" class="mg-nav-logo">Med<span>Guess</span></a>
+  <a href="/game">🩺 MedGuess</a>
+  <a href="/mcat.html">MCAT</a>
+  <a href="/biol240.html">BIOL 240</a>
+  <a href="/chem101.html">CHEM 101</a>
+  <a href="/chem101-quiz.html">CHEM 101 Quiz</a>
+  <a href="/chem101l.html">CHEM 101L</a>
+  <a href="/planner.html">Timeline</a>
+  <a href="/resources">Resources</a>
+</div>
 
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
@@ -1642,7 +1661,7 @@
   <div class="section-label"><span>Practice quizzes</span><div class="section-line"></div></div>
 
   <div class="cards">
-    <a href="chem101_quiz.html" class="game-card">
+    <a href="/chem101-quiz.html" class="game-card">
       <div class="card-top">
         <div class="card-icon purple">⚛</div>
         <div class="card-badge purple">Exam Review</div>
@@ -1655,7 +1674,7 @@
       </div>
     </a>
 
-    <a href="chem_lab.html" class="game-card">
+    <a href="/chem101l.html" class="game-card">
       <div class="card-top">
         <div class="card-icon coral">🧪</div>
         <div class="card-badge coral">Lab Review</div>
