@@ -12,6 +12,22 @@ const sections = [
   { emoji: '📝', title: 'CARS', topics: ['Active Reading', 'Inference Questions', 'Tone & Purpose', 'Passage Mapping', 'Humanities Passages', 'Social Science Passages'] },
 ];
 
+const metabolicProcesses = [
+  { num: 1, title: 'Glycolysis', location: 'Cytoplasm', summary: 'Glucose is split into 2 pyruvate. Net yield: 2 ATP, 2 NADH.' },
+  { num: 2, title: 'Pyruvate Oxidation', location: 'Mitochondrial matrix', summary: 'Pyruvate is converted to acetyl-CoA, releasing 1 NADH and CO2 per pyruvate.' },
+  { num: 3, title: 'Citric Acid Cycle', location: 'Mitochondrial matrix', summary: 'Acetyl-CoA is oxidized. Each turn yields 3 NADH, 1 FADH2, and 1 GTP/ATP.' },
+  { num: 4, title: 'Electron Transport Chain', location: 'Inner mitochondrial membrane', summary: 'Electrons from NADH/FADH2 pass through complexes I–IV, pumping protons to build an electrochemical gradient.' },
+  { num: 5, title: 'Oxidative Phosphorylation', location: 'Inner mitochondrial membrane', summary: 'The proton gradient drives ATP synthase, generating ~26–28 ATP per glucose.' },
+  { num: 6, title: 'Gluconeogenesis', location: 'Liver (mainly)', summary: 'Glucose is synthesized from non-carbohydrate precursors like lactate, glycerol, and amino acids.' },
+  { num: 7, title: 'Glycogenesis', location: 'Liver & muscle', summary: 'Excess glucose is stored as glycogen; stimulated by insulin.' },
+  { num: 8, title: 'Glycogenolysis', location: 'Liver & muscle', summary: 'Glycogen is broken down into glucose-1-phosphate; stimulated by glucagon and epinephrine.' },
+  { num: 9, title: 'Pentose Phosphate Pathway', location: 'Cytoplasm', summary: 'Generates NADPH and ribose-5-phosphate for biosynthesis; produces no ATP.' },
+  { num: 10, title: 'Fatty Acid Synthesis', location: 'Cytoplasm', summary: 'Acetyl-CoA units are built into palmitate using NADPH (lipogenesis).' },
+  { num: 11, title: 'Beta-Oxidation', location: 'Mitochondrial matrix', summary: 'Fatty acids are broken down into acetyl-CoA units, producing NADH and FADH2.' },
+  { num: 12, title: 'Ketogenesis', location: 'Liver mitochondria', summary: 'Acetyl-CoA is converted into ketone bodies during fasting or low-glucose states.' },
+  { num: 13, title: 'Urea Cycle', location: 'Liver', summary: 'Toxic ammonia from amino acid catabolism is converted into urea for excretion.' },
+];
+
 export default function MCATPage() {
   return (
     <main className="page-wrap">
@@ -36,6 +52,24 @@ export default function MCATPage() {
                 </div>
               ))}
             </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="section-label">Learning</div>
+      <div className="page-hero" style={{ padding: '0 0 20px', textAlign: 'left' }}>
+        <h2 className="page-title" style={{ fontSize: '1.4rem' }}>The 13 Core Metabolic Processes</h2>
+        <p className="page-subtitle" style={{ margin: 0 }}>
+          A high-yield map of energy metabolism for the Bio/Biochem section — from glycolysis through the urea cycle.
+        </p>
+      </div>
+      <div className="card-grid">
+        {metabolicProcesses.map(p => (
+          <div key={p.title} className="card" style={{ cursor: 'default' }}>
+            <span className="card-icon" style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text3)' }}>{String(p.num).padStart(2, '0')}</span>
+            <div className="card-title">{p.title}</div>
+            <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text3)', marginTop: 2 }}>{p.location}</div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text3)', marginTop: 8, lineHeight: 1.4 }}>{p.summary}</p>
           </div>
         ))}
       </div>
