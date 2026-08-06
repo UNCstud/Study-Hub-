@@ -79,6 +79,67 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface2);
 }
 
+/* ── NAV DROPDOWN ── */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.nav-dropdown-caret {
+  font-size: 0.6rem;
+  transition: transform 0.15s;
+  color: var(--text3);
+}
+
+.nav-dropdown-caret.open {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 200;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nav-dropdown-item {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text2);
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.nav-dropdown-item:hover, .nav-dropdown-item.active {
+  color: var(--text);
+  background: var(--surface2);
+}
+
 /* ── LAYOUT ── */
 .page-wrap {
   max-width: 900px;
